@@ -1,0 +1,37 @@
+{
+  "jsc": {
+    "parser": {
+      "syntax": "typescript",
+      "jsx": false,
+      "tsx": false,
+      "dynamicImport": false,
+      "privateMethod": false,
+      "functionBind": false,
+      "exportDefaultFrom": false,
+      "exportNamespaceFrom": false,
+      "decorators": true,
+      "decoratorsBeforeExport": true,
+      "topLevelAwait": false,
+      "importMeta": false,
+      "preserveAllComments": false,
+      "copyFiles": true
+    },
+    "transform": {
+      "legacyDecorator": true,
+      "decoratorMetadata": true
+    },
+    "target": "es2022",
+    "loose": true,
+    "externalHelpers": false,
+    "keepClassNames": true,
+    "experimental": {
+      "keepImportAssertions": true
+    },
+    "minify": { "compress": true }
+  },
+  "module": {
+    "type": "es6",
+    "lazy": true
+  },
+  "minify": true
+}

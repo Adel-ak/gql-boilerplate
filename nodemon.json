@@ -1,0 +1,9 @@
+{
+  "verbose": true,
+  "ignore": ["*.test.js", "fixtures/*"],
+  "watch": ["./src/**/*.ts", "./src/**/*.gql"],
+  "ext": "ts, gql",
+  "execMap": {
+    "ts": "ts-node-esm --swc"
+  }
+}

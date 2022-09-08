@@ -1,0 +1,48 @@
+definitions:
+  add: &top-comment
+    content: >
+      /**
+       * NOTE: THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY IT DIRECTLY.
+       */
+
+      /* eslint-disable */
+
+      // 👇️ ts-nocheck ignores all ts errors in the file
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+
+      // @ts-nocheck
+overwrite: true
+watch: true
+schema: './src/gql/**/typeDefs/*.gql*'
+emitLegacyCommonJSImports: false
+generates:
+  ./src/gql/:
+    preset: graphql-modules
+    presetConfig:
+      baseTypesPath: ../generated-types/graphql.ts # Where to create the complete schema types
+      filename: generated-types/module-types.ts # Where to create each module types
+    plugins:
+      - add: *top-comment
+      - add:
+          content: 'import { CustomScalars } from "../shared/scalars.js"'
+      - 'typescript'
+      - 'typescript-resolvers'
+    config:
+      typesPrefix: GQL_
+      enumPrefix: true
+      enumValues: '../shared/enums.js'
+      noNamespaces: true
+      useIndexSignature: true
+      contextType: 'GraphQLModules.GlobalContext'
+      scalars:
+        Upload: CustomScalars['Upload']
+        Date: CustomScalars['Date']
+        DateTime: CustomScalars['DateTime']
+        EmailAddress: CustomScalars['EmailAddress']
+        JSON: CustomScalars['JSON']
+        ObjectID: CustomScalars['ObjectID']
+        UUID: CustomScalars['UUID']
+  ./graphql.schema.json:
+    plugins:
+      - 'introspection'
