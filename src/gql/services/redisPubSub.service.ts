@@ -22,7 +22,7 @@ export class RedisService {
     if (REDIS_USER_NAME) redisNode.username = REDIS_USER_NAME;
     if (REDIS_PASSWORD) redisNode.password = REDIS_PASSWORD;
 
-    this.#pubsub ==
+    this.pubsub ==
       new RedisPubSub({
         publisher: new Redis(redisNode),
         subscriber: new Redis(redisNode),
@@ -32,15 +32,15 @@ export class RedisService {
       });
   }
 
-  #pubsub: RedisPubSub;
+  private pubsub: RedisPubSub;
 
   asyncIterator = <T>(triggers: string | string[], options?: unknown) => {
-    return this.#pubsub.asyncIterator<T>(triggers, options);
+    return this.pubsub.asyncIterator<T>(triggers, options);
   };
 
   publish = async <T>(triggers: string, payload: T) => {
     try {
-      return this.#pubsub.publish<T>(triggers, payload);
+      return this.pubsub.publish<T>(triggers, payload);
     } catch (err) {}
   };
 }

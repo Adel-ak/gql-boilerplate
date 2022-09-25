@@ -12,14 +12,15 @@ const fbCert = serviceAccount as ServiceAccount;
 @Injectable({ global: true, scope: Scope.Singleton })
 export class FirebaseService {
   constructor() {
-    this.#mainApp = admin.initializeApp({
+    this.mainApp = admin.initializeApp({
       credential: admin.credential.cert(fbCert),
     });
 
-    this.auth = this.#mainApp.auth;
+    this.auth = this.mainApp.auth;
   }
 
-  #mainApp: FbApp;
+  private mainApp: FbApp;
+
   auth: typeof admin.auth;
 
   validToken = async (token?: string): Promise<GoResponse<DecodedIdToken, ForbiddenError>> => {

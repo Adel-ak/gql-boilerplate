@@ -7,6 +7,10 @@ import { initDb } from './db/index.js';
 import { initExpressMiddleware } from './middleware/express.js';
 import { gqlApp } from './gql/index.js';
 import { startApolloServer } from './apollo/server.js';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc.js';
+
+dayjs.extend(utc);
 
 const app = express();
 
