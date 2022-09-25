@@ -58,6 +58,7 @@
     "mongoose-aggregate-paginate-v2": "^1.0.6",
     "mongoose-paginate-v2": "^1.7.1",
     "morgan": "^1.10.0",
+    "nconf": "^0.12.0",
     "reflect-metadata": "^0.1.13",
     "signale": "^1.4.0",
     "ws": "^8.9.0"
@@ -81,6 +82,7 @@
     "@types/module-alias": "^2.0.1",
     "@types/mongoose-aggregate-paginate-v2": "^1.0.5",
     "@types/morgan": "^1.9.3",
+    "@types/nconf": "^0.10.3",
     "@types/node": "^18.7.20",
     "@types/signale": "^1.4.4",
     "@types/ws": "^8.5.3",

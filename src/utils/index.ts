@@ -2,6 +2,8 @@ import { ValidationError, ValidationErrorItem } from 'joi';
 import mongoose from 'mongoose';
 import { GqlResult } from '../shared/types/index.js';
 
+import { __dirname } from './path.js';
+
 const { Types } = mongoose;
 
 export const enumValues = <T extends string | number>(e: any): T[] => {

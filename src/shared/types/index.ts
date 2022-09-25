@@ -4,6 +4,8 @@ import { GQL_FieldsError, GQL_ReqError, Maybe } from '../../generated-types/grap
 import Upload from 'graphql-upload/Upload.mjs';
 import { Env } from '../../config/env.js';
 
+export type NotArray<T> = T extends Array<unknown> ? never : T;
+
 export type AuthUser = DecodedIdToken & {
   role: ERoles;
   permissions: [];
