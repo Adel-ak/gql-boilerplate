@@ -9,6 +9,12 @@ export type NotArray<T> = T extends Array<unknown> ? never : T;
 export type AuthUser = DecodedIdToken & {
   role: ERoles;
   permissions: [];
+  name: string;
+  iss: string;
+  user_id: string;
+  sub: string;
+  iat: number;
+  uid: string;
 };
 
 export type GoResponse<R = any, E = any> = Promise<[Maybe<R>, Maybe<E>]>;

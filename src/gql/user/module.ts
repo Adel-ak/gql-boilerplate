@@ -1,11 +1,8 @@
 import { createModule } from 'graphql-modules';
-import { resolvers as scalarResolvers } from 'graphql-scalars';
-import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs';
 import { __dirname } from '../../utils/path.js';
 import { loadFiles } from '@graphql-tools/load-files';
 import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge';
-import isAuthenticated from '../middleware/auth.js';
-import { ERoles } from '../../shared/enums.js';
+import { UserProvider } from '../services/user.service.js';
 
 const dirname = __dirname(import.meta.url);
 
@@ -16,21 +13,19 @@ const [loadedTypeDefs, loadedResolvers] = await Promise.all([
 ]);
 
 const typeDefs = mergeTypeDefs(loadedTypeDefs);
-const resolvers = mergeResolvers([...loadedResolvers, scalarResolvers, { Upload: GraphQLUpload }]);
+const resolvers = mergeResolvers([...loadedResolvers, {}]);
 
 const middlewares = {
   Query: {
     me: [],
   },
-  Mutation: {
-    _empty: [isAuthenticated([ERoles.User])],
-  },
 };
 
-export const appModule = createModule({
-  id: 'app-module',
+export const userModule = createModule({
+  id: 'user-module',
   dirname: __dirname(import.meta.url),
   typeDefs,
   resolvers,
   middlewares,
+  providers: [UserProvider],
 });

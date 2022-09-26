@@ -1,9 +1,10 @@
 import mongoose from 'mongoose';
 import dayjs from 'dayjs';
+import { GQL_User } from '../../generated-types/graphql.js';
 
 const { Schema, model, Types } = mongoose;
 
-const SchemaDef = new Schema(
+const SchemaDef = new Schema<GQL_User>(
   {
     _id: {
       type: Schema.Types.ObjectId,
@@ -11,8 +12,6 @@ const SchemaDef = new Schema(
     },
     name: { type: String, required: true, index: true },
     email: { type: String, required: true, index: true },
-    phone: { type: String, required: false },
-    disabled: { type: Boolean, required: true, default: false },
     permissions: { type: [String], require: true },
     createdAt: { type: Date, default: () => dayjs().toDate() },
     updatedAt: { type: Date, default: null },
@@ -24,4 +23,4 @@ const SchemaDef = new Schema(
   },
 );
 
-export const UserSchema = model('users', SchemaDef);
+export const UserSchema = model<GQL_User>('users', SchemaDef);

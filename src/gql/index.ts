@@ -9,6 +9,7 @@ import httpLogger from './middleware/httpLogger.js';
 import rateLimiter from './middleware/rateLimiter.js';
 import { FirebaseProvider } from './services/firebase.service.js';
 import { RedisProvider } from './services/redisPubSub.service.js';
+import { userModule } from './user/module.js';
 
 declare global {
   namespace GraphQLModules {
@@ -23,7 +24,7 @@ declare global {
 }
 
 export const gqlApp = createApplication({
-  modules: [appModule],
+  modules: [appModule, userModule],
   providers: [RedisProvider, FirebaseProvider],
   middlewares: {
     '*': {
