@@ -5,7 +5,7 @@ import { enumValues } from '../../../utils/index.js';
 
 const options = { abortEarly: false, errors: { wrap: { label: '' } }, allowUnknown: true };
 
-export const createUserDtoV = (input: GQL_MutateUserInput): Joi.ValidationResult => {
+export const mutateUserDtoV = (input: GQL_MutateUserInput): Joi.ValidationResult => {
   const joiObj: Record<keyof GQL_MutateUserInput, any> = {
     name: Joi.string().required().min(3).label('Name'),
     email: Joi.string().required().email().label('Email'),

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import dayjs from 'dayjs';
-import { GQL_User } from '../../generated-types/graphql.js';
+import { ERoles, GQL_User } from '../../generated-types/graphql.js';
 
 const { Schema, model, Types } = mongoose;
 
@@ -10,6 +10,7 @@ const SchemaDef = new Schema<GQL_User>(
       type: Schema.Types.ObjectId,
       default: () => new Types.ObjectId(),
     },
+    role: { type: String, required: true, enum: ERoles },
     name: { type: String, required: true, index: true },
     email: { type: String, required: true, index: true },
     permissions: { type: [String], require: true },

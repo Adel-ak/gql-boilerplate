@@ -52,8 +52,8 @@ export class FirebaseService {
     uid?: string,
   ): GoResponse<UserRecord, ReqError | GQL_FieldsError> => {
     try {
-      const { email, name: displayName, password } = input;
-
+      const { email, name, password } = input;
+      const displayName = name.trim();
       const user = await this.auth().createUser({
         uid,
         email: email.trim(),
@@ -90,6 +90,54 @@ export class FirebaseService {
         return [null, inputErrors];
       }
 
+      return [null, new ReqError({})];
+    }
+  };
+
+  updateUser = async (
+    uid: string,
+    input: GQL_MutateUserInput,
+  ): Promise<GoResponse<UserRecord, ReqError | GQL_FieldsError>> => {
+    try {
+      const { email, password, name } = input;
+
+      const displayName = name.trim();
+      const user = await this.auth().updateUser(uid, {
+        email,
+        displayName,
+        password: password.trim(),
+      });
+
+      return [user, null];
+    } catch (err: any) {
+      console.log('🚀 ~ file: firebase.service.ts ~ line 113 ~ FirebaseService ~ err', err);
+      const fieldsError: GQL_FieldError[] = [];
+
+      const { EMAIL_ALREADY_EXISTS, INVALID_PASSWORD } = FireBaseAuthErrorCode;
+
+      switch (err.code) {
+        case EMAIL_ALREADY_EXISTS:
+          fieldsError.push({
+            field: 'email',
+            message: 'The email address is already in use by another account.',
+          });
+          break;
+        case INVALID_PASSWORD:
+          fieldsError.push({
+            field: 'password',
+            message: 'The password must be at least 6 characters long.',
+          });
+          break;
+      }
+
+      if (fieldsError.length > 0) {
+        const inputErrors: GQL_FieldsError = {
+          fields: fieldsError,
+          message: '',
+          __typename: 'FieldsError',
+        };
+        return [null, inputErrors];
+      }
       return [null, new ReqError({})];
     }
   };

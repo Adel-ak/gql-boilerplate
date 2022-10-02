@@ -9,17 +9,35 @@ import { GoResponse, ReqError } from '../../shared/types/index.js';
   scope: Scope.Singleton,
 })
 export class UserService {
-  createUser = async (id: GQL_ObjectId, input: GQL_MutateUserInput): Promise<GoResponse<any, ReqError>> => {
+  createUser = async (_id: GQL_ObjectId, input: GQL_MutateUserInput): Promise<GoResponse<any, ReqError>> => {
     try {
       const now = dayjs().utc();
       const user = new UserSchema({
         ...input,
-        id,
+        _id,
         createdAt: now,
         _v: 0,
       });
 
       await user.save();
+
+      return [user, null];
+    } catch (err) {
+      return [null, new ReqError({})];
+    }
+  };
+
+  updateUser = async (_id: GQL_ObjectId, input: GQL_MutateUserInput): Promise<GoResponse<any, ReqError>> => {
+    try {
+      const now = dayjs().utc();
+
+      const user = await UserSchema.findOneAndUpdate(_id, {
+        $set: {
+          ...input,
+          updatedAt: now,
+        },
+        $inc: { _v: 1 },
+      }).exec();
 
       return [user, null];
     } catch (err) {

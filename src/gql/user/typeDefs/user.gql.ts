@@ -34,6 +34,6 @@ export default gql`
 
   extend type Mutation {
     createUser(input: MutateUserInput!): UserResult
-    updateUser(input: MutateUserInput!): UserResult
+    updateUser(id: ObjectID!, input: MutateUserInput!): UserResult
   }
 `;

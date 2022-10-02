@@ -31,6 +31,7 @@ export class ReqError implements GQL_ReqError {
     this.message = arg?.message || 'Oops Something went wrong.';
     if (Env.IS_DEV) this.stack = arg?.stack || null;
     else this.stack = null;
+    this.__typename = 'ReqError';
   }
 
   message: string;
