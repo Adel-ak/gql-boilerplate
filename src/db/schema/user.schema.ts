@@ -4,7 +4,11 @@ import { ERoles, GQL_User } from '../../generated-types/graphql.js';
 
 const { Schema, model, Types } = mongoose;
 
-const SchemaDef = new Schema<GQL_User>(
+export interface IUser extends GQL_User {
+  password: string;
+}
+
+const SchemaDef = new Schema<IUser>(
   {
     _id: {
       type: Schema.Types.ObjectId,
@@ -12,16 +16,17 @@ const SchemaDef = new Schema<GQL_User>(
     },
     role: { type: String, required: true, enum: ERoles },
     name: { type: String, required: true, index: true },
-    email: { type: String, required: true, index: true },
-    permissions: { type: [String], require: true },
+    email: { type: String, required: true, index: false, unique: false },
+    password: { type: String, required: true },
+    deactivated: { type: Boolean, default: false },
     createdAt: { type: Date, default: () => dayjs().toDate() },
     updatedAt: { type: Date, default: null },
     _v: { type: Number, required: false, default: 0 },
   },
   {
-    timestamps: true,
     versionKey: '_v',
+    timestamps: true,
   },
 );
 
-export const UserSchema = model<GQL_User>('users', SchemaDef);
+export const UserSchema = model<IUser>('users', SchemaDef);

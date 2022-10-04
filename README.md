@@ -24,8 +24,8 @@ This is a boilerplate graphql express server, it has graphql-ws enabled and uses
 Things it has
 
 - rate limiting express and graphql middleware
-- graphql auth middle (firebase)
-- aws, firebase and redis pubsub graphql DI
+- graphql auth middleware
+- aws and redis pubsub graphql DI
 - Request logging to console (with color changing based on response time)
   1. Red >= 5sec
   2. Yellow >= 2sec

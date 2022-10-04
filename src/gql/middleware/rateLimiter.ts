@@ -1,7 +1,7 @@
 import { getGraphQLRateLimiter } from 'graphql-rate-limit';
 import { Env } from '../../config/env.js';
 import { ApolloError } from 'apollo-server-core';
-import { Middleware } from '../../shared/types/graphql-modules.js';
+import { Middleware } from '../../shared/types/graphql-modules.type.js';
 
 const rateLimiter = (options?: { max?: number; window?: number }): Middleware => {
   const limiter = getGraphQLRateLimiter({

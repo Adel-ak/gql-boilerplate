@@ -1,26 +1,33 @@
-import { AuthenticationError, ForbiddenError } from 'apollo-server-core';
+import { ApolloError, ForbiddenError } from 'apollo-server-core';
 import { ERoles } from '../../shared/enums.js';
-import { Middleware } from '../../shared/types/graphql-modules.js';
-import { FirebaseService } from '../services/firebase.service.js';
-import { AuthUser } from '../../shared/types/index.js';
+import { Middleware } from '../../shared/types/graphql-modules.type.js';
+import { AuthService } from '../services/auth.service.js';
+import { SessionService } from '../services/session.service.js';
 
-const isAuthenticated = (allowedRoles: ERoles[] = [ERoles.Admin]): Middleware => {
+const isAuthenticated = (allowedRoles: ERoles[] = []): Middleware => {
   return async ({ context }, next) => {
-    const bearer = context.req.headers.authorization;
-    const token = bearer ? bearer.replace('Bearer ', '') : null;
+    const { req, injector } = context;
 
-    if (token) {
-      const { auth } = context.injector.get(FirebaseService);
-      const decoded = (await auth().verifyIdToken(token, false)) as AuthUser;
-      if (allowedRoles.includes(decoded.role)) {
-        context.authUser = decoded;
+    const bearer = req.cookies.authorization || req.headers.authorization;
 
-        return next();
-      }
+    const authService = injector.get(AuthService);
+    const sessionService = injector.get(SessionService);
+
+    const [decodedToken, decodeErr] = await authService.validateToken(bearer);
+
+    if (decodeErr) throw new ApolloError(decodeErr.message);
+
+    const [user, sessionErr] = await sessionService.validateSession(decodedToken!);
+
+    if (sessionErr) throw new ApolloError(sessionErr.message);
+
+    if (!!allowedRoles.length && !allowedRoles.includes(user!.role)) {
       throw new ForbiddenError('Invalid Authentication Role.');
     }
 
-    throw new AuthenticationError('You must be logged in.');
+    context.authUser = user;
+
+    return next();
   };
 };
 

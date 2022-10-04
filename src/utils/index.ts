@@ -1,6 +1,6 @@
 import { ValidationError, ValidationErrorItem } from 'joi';
 import mongoose from 'mongoose';
-import { GqlResult } from '../shared/types/index.js';
+import { GqlResult } from '../shared/types/gql.type.js';
 
 import { __dirname } from './path.js';
 
@@ -22,7 +22,6 @@ export const toResultFieldsError = (error: ValidationError): GqlResult => {
   return new GqlResult({
     success: false,
     error: {
-      message: `One or more fields are invalid.`,
       fields: fields,
       __typename: 'FieldsError',
     },

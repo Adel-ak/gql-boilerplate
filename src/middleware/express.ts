@@ -8,9 +8,11 @@ import chalk from 'chalk';
 import express, { Express, Request, json, urlencoded } from 'express';
 import path from 'path';
 import { __dirname } from '../utils/path.js';
+import cookieParser from 'cookie-parser';
+import { altairExpress } from 'altair-express-middleware';
 
 export const initExpressMiddleware = async (app: Express) => {
-  const { PORT, IS_DEV, THROTTLE_LIMIT, THROTTLE_TTL } = Env;
+  const { PORT, IS_DEV, THROTTLE_LIMIT, THROTTLE_TTL, GQL_PLAYGROUND } = Env;
 
   const originWhitelist = [
     `http://localhost:${PORT}`,
@@ -84,7 +86,7 @@ export const initExpressMiddleware = async (app: Express) => {
     const imagesFolderPath = path.join(__dirname(import.meta.url), '../..', 'uploads');
     app.use(express.static(imagesFolderPath));
   }
-
+  app.use(cookieParser());
   app.use(json());
   app.use(urlencoded({ extended: true }));
   app.use(cors(corsOptions));
@@ -92,4 +94,13 @@ export const initExpressMiddleware = async (app: Express) => {
   app.use(helmet(helmetOptions));
   app.use(rateLimit(rateLimitOptions));
   app.use(morganMiddleware);
+  if (GQL_PLAYGROUND) {
+    app.use(
+      '/graphql',
+      altairExpress({
+        endpointURL: '/graphql',
+        subscriptionsEndpoint: `ws://localhost:${PORT}/graphql`,
+      }),
+    );
+  }
 };

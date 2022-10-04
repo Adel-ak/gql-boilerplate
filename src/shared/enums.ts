@@ -9,9 +9,3 @@ export enum EValidFileMimeType {
   JPG = 'image/jpg',
   PNG = 'image/png',
 }
-
-export enum EAccessPermissions {
-  CAN_ADD_TO_WAIT_LIST = 'CAN_ADD_TO_WAIT_LIST',
-  CAN_CREATE_USER = 'CAN_CREATE_USER',
-  CAN_UPDATE_USER = 'CAN_UPDATE_USER',
-}

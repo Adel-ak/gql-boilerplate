@@ -7,8 +7,8 @@ export default gql`
     _id: ObjectID!
     name: String!
     email: EmailAddress!
+    deactivated: Boolean!
     role: ERoles!
-    permissions: [String!]!
     createdAt: DateTime!
     updatedAt: DateTime
     _v: Int!
@@ -16,12 +16,17 @@ export default gql`
 
   # ***************** Input Types *****************
 
-  input MutateUserInput {
+  input CreateUserInput {
     name: String!
     email: String!
     password: String!
     role: ERoles!
-    permissions: [String!]!
+  }
+
+  input UpdateProfileInput {
+    name: String!
+    email: String!
+    password: String!
   }
 
   # ***************** Result Types *****************
@@ -33,7 +38,7 @@ export default gql`
   }
 
   extend type Mutation {
-    createUser(input: MutateUserInput!): UserResult
-    updateUser(id: ObjectID!, input: MutateUserInput!): UserResult
+    createUser(input: CreateUserInput!): UserResult
+    updateProfile(input: UpdateProfileInput!): UserResult
   }
 `;

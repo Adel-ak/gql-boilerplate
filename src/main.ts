@@ -2,15 +2,12 @@ import './utils/loadConfig.js';
 import 'reflect-metadata';
 import express from 'express';
 import http from 'http';
-import { Env, validateEnv } from './config/env.js';
+import { Env } from './config/env.js';
+import { validateEnv } from './config/index.js';
 import { initDb } from './db/index.js';
 import { initExpressMiddleware } from './middleware/express.js';
 import { gqlApp } from './gql/index.js';
 import { startApolloServer } from './apollo/server.js';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc.js';
-
-dayjs.extend(utc);
 
 const app = express();
 

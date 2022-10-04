@@ -4,7 +4,9 @@ import { Injectable, Scope } from 'graphql-modules';
 import path from 'path';
 import { finished } from 'stream/promises';
 import { Env } from '../../config/env.js';
-import { GoResponse, ReqError, TAwsUpload } from '../../shared/types/index.js';
+import { IAwsUpload } from '../../shared/types/aws.type.js';
+import { ReqError } from '../../shared/types/gql.type.js';
+import { GoResponse } from '../../shared/types/index.js';
 import { Logger } from '../../utils/logger.js';
 
 type TUploadRes = GoResponse<S3.ManagedUpload.SendData, ReqError>;
@@ -13,7 +15,7 @@ type TUploadRes = GoResponse<S3.ManagedUpload.SendData, ReqError>;
 export class AwsProvider {
   private log = new Logger(AwsProvider.name);
 
-  upload = async (args: TAwsUpload): TUploadRes => {
+  upload = async (args: IAwsUpload): TUploadRes => {
     const {
       file: { file },
       fileName,

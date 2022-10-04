@@ -2,10 +2,8 @@ import { createModule } from 'graphql-modules';
 import { __dirname } from '../../utils/path.js';
 import { loadFiles } from '@graphql-tools/load-files';
 import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge';
-import { UserProvider } from '../services/user.service.js';
-import { UserModule } from './generated-types/module-types.js';
-import isAuthenticated from '../middleware/auth.js';
-import { ERoles } from '../../shared/enums.js';
+import { SessionProvider } from '../services/session.service.js';
+import { AuthProvider } from '../services/auth.service.js';
 
 const dirname = __dirname(import.meta.url);
 
@@ -18,18 +16,17 @@ const [loadedTypeDefs, loadedResolvers] = await Promise.all([
 const typeDefs = mergeTypeDefs(loadedTypeDefs);
 const resolvers = mergeResolvers([...loadedResolvers, {}]);
 
-const middlewares: UserModule.MiddlewareMap = {
-  Mutation: {
-    createUser: [isAuthenticated([ERoles.Admin])],
-    updateProfile: [isAuthenticated()],
+const middlewares = {
+  Query: {
+    me: [],
   },
 };
 
-export const userModule = createModule({
-  id: 'user-module',
+export const authModule = createModule({
+  id: 'auth-module',
   dirname: __dirname(import.meta.url),
   typeDefs,
   resolvers,
   middlewares,
-  providers: [UserProvider],
+  providers: [AuthProvider, SessionProvider],
 });

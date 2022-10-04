@@ -1,7 +1,6 @@
 import {
   ApolloServerPluginDrainHttpServer,
   ApolloServerPluginLandingPageDisabled,
-  ApolloServerPluginLandingPageGraphQLPlayground,
   GraphQLExecutor,
 } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
@@ -35,16 +34,7 @@ export const startApolloServer = async (
           };
         },
       },
-      GQL_PLAYGROUND
-        ? ApolloServerPluginLandingPageGraphQLPlayground({
-            settings: {
-              'schema.polling.enable': false,
-              'editor.reuseHeaders': true,
-              'tracing.hideTracingResponse': false,
-              'request.credentials': 'include',
-            },
-          })
-        : ApolloServerPluginLandingPageDisabled(),
+      ApolloServerPluginLandingPageDisabled(),
     ];
 
     const apolloServer = new ApolloServer({

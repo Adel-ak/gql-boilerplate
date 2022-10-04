@@ -9,7 +9,6 @@ export default gql`
   }
 
   type FieldsError {
-    message: String!
     fields: [FieldError!]!
   }
 

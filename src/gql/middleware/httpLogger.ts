@@ -2,7 +2,7 @@ import bunyan from 'bunyan';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
 import { resolvePath } from '../../utils/path.js';
-import { Middleware } from '../../shared/types/graphql-modules.js';
+import { Middleware } from '../../shared/types/graphql-modules.type.js';
 
 dayjs.extend(utc);
 
