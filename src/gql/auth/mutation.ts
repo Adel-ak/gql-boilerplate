@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { CookieOptions } from 'express';
 import { Env } from '../../config/env.js';
 import { GQL_MutationResolvers } from '../../generated-types/graphql.js';
@@ -31,10 +32,17 @@ export const Mutation: GQL_MutationResolvers = {
 
     const tokens = await sessionService.createSession(user!, req);
 
-    const cookieOptions: CookieOptions = { httpOnly: true, sameSite: true, secure: !Env.IS_DEV };
-    res
-      .cookie('accessToken', tokens.accessToken, cookieOptions)
-      .cookie('refreshToken', tokens.refreshToken, cookieOptions);
+    const { IS_DEV } = Env;
+
+    const cookieOptions: CookieOptions = {
+      secure: IS_DEV,
+      httpOnly: true,
+      sameSite: 'strict',
+      expires: dayjs().utc().add(1, 'month').toDate(),
+    };
+
+    res.cookie('accessToken', tokens.accessToken, cookieOptions);
+    res.cookie('refreshToken', tokens.refreshToken, cookieOptions);
 
     return new GqlResult({
       success: true,

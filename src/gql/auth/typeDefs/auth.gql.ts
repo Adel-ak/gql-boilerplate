@@ -28,8 +28,8 @@ export default gql`
   }
 
   extend type Mutation {
-    login(input: LoginInput!): AuthTokensResult
-    refreshSession(input: RefreshSessionInput!): AuthTokensResult
-    signOut: Boolean
+    login(input: LoginInput!): AuthTokensResult!
+    refreshSession(input: RefreshSessionInput!): AuthTokensResult!
+    signOut: Boolean!
   }
 `;

@@ -15,7 +15,7 @@ const rateLimiter = (options?: { max?: number; window?: number }): Middleware =>
     const error = await limiter({ parent, args, context, info }, { max, window: `${window}ms` });
 
     if (error) {
-      throw new ApolloError('Too many requests.');
+      throw new ApolloError('Too many requests.', 'RATE_LIMIT');
     }
 
     return next();
