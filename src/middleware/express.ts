@@ -1,18 +1,17 @@
 import cors, { CorsOptions } from 'cors';
 import helmet, { HelmetOptions } from 'helmet';
 import compression from 'compression';
-import rateLimit, { Options } from 'express-rate-limit';
 import { Env } from '../config/env.js';
 import morgan from 'morgan';
 import chalk from 'chalk';
 import express, { Express, Request, json, urlencoded } from 'express';
 import path from 'path';
-import { __dirname } from '../utils/path.js';
 import cookieParser from 'cookie-parser';
 import { altairExpress } from 'altair-express-middleware';
+import { __dirname } from '../utils/path.js';
 
 export const initExpressMiddleware = async (app: Express) => {
-  const { PORT, IS_DEV, THROTTLE_LIMIT, THROTTLE_TTL, GQL_PLAYGROUND } = Env;
+  const { PORT, IS_DEV, GQL_PLAYGROUND } = Env;
 
   const originWhitelist = [
     `http://localhost:${PORT}`,
@@ -24,7 +23,7 @@ export const initExpressMiddleware = async (app: Express) => {
 
   const corsOptions: CorsOptions = {
     origin: function (origin: any, callback: any) {
-      if (originWhitelist.indexOf(origin) !== -1 || !origin) {
+      if (originWhitelist.indexOf(origin) !== -1 || !origin || IS_DEV) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
@@ -38,16 +37,6 @@ export const initExpressMiddleware = async (app: Express) => {
     contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false,
   };
-
-  const rateLimitOptions = {
-    max: THROTTLE_LIMIT,
-    windowMs: THROTTLE_TTL,
-    skip: (req) => {
-      const isApi = req.url.includes('/api');
-      if (isApi) return false;
-      return true;
-    },
-  } as Partial<Options>;
 
   morgan.token('opName', (req: Request) => {
     const body = req.body;
@@ -86,13 +75,13 @@ export const initExpressMiddleware = async (app: Express) => {
     const imagesFolderPath = path.join(__dirname(import.meta.url), '../..', 'uploads');
     app.use(express.static(imagesFolderPath));
   }
+
   app.use(cookieParser());
   app.use(json());
   app.use(urlencoded({ extended: true }));
   app.use(cors(corsOptions));
   app.use(compression());
   app.use(helmet(helmetOptions));
-  app.use(rateLimit(rateLimitOptions));
   app.use(morganMiddleware);
   if (GQL_PLAYGROUND) {
     app.use(
@@ -100,6 +89,10 @@ export const initExpressMiddleware = async (app: Express) => {
       altairExpress({
         endpointURL: '/graphql',
         subscriptionsEndpoint: `ws://localhost:${PORT}/graphql`,
+        initialSettings: {
+          'request.withCredentials': true,
+        },
+        preserveState: true,
       }),
     );
   }

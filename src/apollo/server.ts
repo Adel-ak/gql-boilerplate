@@ -43,6 +43,7 @@ export const startApolloServer = async (
       schema,
       plugins,
       executor,
+      csrfPrevention: true,
       cache: 'bounded',
       formatResponse: (response, options) => {
         const url = (options.context as any).req.url;
@@ -62,7 +63,10 @@ export const startApolloServer = async (
 
     await apolloServer.start();
 
-    apolloServer.applyMiddleware({ app, cors: false });
+    apolloServer.applyMiddleware({
+      app,
+      cors: false,
+    });
 
     return apolloServer;
   } catch (err) {

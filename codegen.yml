@@ -26,23 +26,24 @@ generates:
       - add: *top-comment
       - add:
           content: 'import { CustomScalars } from "../shared/scalars.js"'
-      - 'typescript'
-      - 'typescript-resolvers'
-    config:
-      typesPrefix: GQL_
-      enumPrefix: true
-      enumValues: '../shared/enums.js'
-      noNamespaces: true
-      useIndexSignature: true
-      contextType: 'GraphQLModules.GlobalContext'
-      scalars:
-        Upload: CustomScalars['Upload']
-        Date: CustomScalars['Date']
-        DateTime: CustomScalars['DateTime']
-        EmailAddress: CustomScalars['EmailAddress']
-        JSON: CustomScalars['JSON']
-        ObjectID: CustomScalars['ObjectID']
-        UUID: CustomScalars['UUID']
+      - typescript:
+          enumsAsTypes: false
+          typesPrefix: GQL_
+          scalars:
+            Upload: CustomScalars['Upload']
+            Date: CustomScalars['Date']
+            DateTime: CustomScalars['DateTime']
+            EmailAddress: CustomScalars['EmailAddress']
+            JSON: CustomScalars['JSON']
+            ObjectID: CustomScalars['ObjectID']
+            UUID: CustomScalars['UUID']
+      - typescript-resolvers:
+          enumsAsTypes: false
+          typesPrefix: GQL_
+          noNamespaces: true
+          useIndexSignature: true
+          contextType: 'GraphQLModules.GlobalContext'
+
   ./graphql.schema.json:
     plugins:
       - 'introspection'

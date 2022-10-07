@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
-import dayjs from 'dayjs';
-import { ERoles, GQL_User } from '../../generated-types/graphql.js';
+import { GQL_ERoles, GQL_User } from '../../generated-types/graphql.js';
+import { genDefaultID, schemaDefaultOptions } from '../index.js';
 
-const { Schema, model, Types } = mongoose;
+const { Schema, model } = mongoose;
 
 export interface IUser extends GQL_User {
   password: string;
@@ -10,23 +10,17 @@ export interface IUser extends GQL_User {
 
 const SchemaDef = new Schema<IUser>(
   {
-    _id: {
-      type: Schema.Types.ObjectId,
-      default: () => new Types.ObjectId(),
-    },
-    role: { type: String, required: true, enum: ERoles },
-    name: { type: String, required: true, index: true },
-    email: { type: String, required: true, index: false, unique: false },
+    _id: { type: Schema.Types.ObjectId, default: genDefaultID },
+    role: { type: String, required: true, enum: GQL_ERoles },
+    name: { type: String, required: true },
+    userName: { type: String, required: true, index: true, unique: true },
     password: { type: String, required: true },
     deactivated: { type: Boolean, default: false },
-    createdAt: { type: Date, default: () => dayjs().toDate() },
-    updatedAt: { type: Date, default: null },
+    createdAt: { type: Date },
+    updatedAt: { type: Date },
     _v: { type: Number, required: false, default: 0 },
   },
-  {
-    versionKey: '_v',
-    timestamps: true,
-  },
+  schemaDefaultOptions,
 );
 
 export const UserSchema = model<IUser>('users', SchemaDef);

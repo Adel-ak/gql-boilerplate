@@ -4,7 +4,6 @@ import { TObjectId } from './types/index.js';
 export type CustomScalars = {
   Date: Date;
   DateTime: Date;
-  EmailAddress: string;
   JSON: string;
   ObjectID: TObjectId;
   UUID: string | number;

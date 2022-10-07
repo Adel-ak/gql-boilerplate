@@ -8,8 +8,8 @@ export default gql`
     message: String!
   }
 
-  type FieldsError {
-    fields: [FieldError!]!
+  type FieldErrors {
+    fieldErrors: [FieldError!]!
   }
 
   type ReqError {
@@ -17,42 +17,46 @@ export default gql`
     stack: JSON
   }
 
-  type Test {
-    id: Int!
-    text: String
-    i18n: TestI18nLangs
+  type StoreBranches {
+    code: String!
+    name: String!
+  }
+
+  type AppProperties {
+    _id: ObjectID!
+    maxWishPerClient: Int!
+    roles: [String!]!
+    branches: [StoreBranches!]!
+    createdAt: DateTime!
+    updatedAt: DateTime
+    _v: Int!
   }
 
   # ***************** Enum Types *****************
 
   enum ERoles {
-    Dev
-    User
     Admin
+    Manager
+    User
   }
 
-  # ***************** Union Types *****************
+  # ***************** Input Types *****************
 
-  union ErrorResult = ReqError | FieldsError
-
-  # ***************** interface Types *****************
-
-  interface Result {
-    success: Boolean!
-    error: ErrorResult
+  input UpdateAppPropertiesInput {
+    maxWishPerClient: Int!
   }
 
   # ***************** Root Types *****************
 
   type Query {
-    _empty(text: String): Test
+    getAppProperties: AppProperties!
   }
 
   type Subscription {
-    _empty: Test
+    _empty: String
   }
 
   type Mutation {
-    _empty: String
+    updateAppProperties(input: UpdateAppPropertiesInput!): AppProperties!
   }
 `;

@@ -1,17 +1,24 @@
 import { ValidationError, ValidationErrorItem } from 'joi';
 import mongoose from 'mongoose';
-import { GqlResult } from '../shared/types/gql.type.js';
+import { GQL_FieldError, GQL_FieldErrors } from '../generated-types/graphql.js';
 
 import { __dirname } from './path.js';
 
 const { Types } = mongoose;
 
+/**
+ * Return a random number between min and max, inclusive.
+ * @param [min=1] - The minimum number that can be returned.
+ * @param [max=5] - The maximum number to return.
+ */
+export const randNum = (min = 1, max = 5) => Math.floor(Math.random() * (max - min + 1)) + min;
+
 export const enumValues = <T extends string | number>(e: any): T[] => {
   return typeof e === 'object' ? Object.values(e) : [];
 };
 
-export const toResultFieldsError = (error: ValidationError): GqlResult => {
-  const fields = error.details.map((err: ValidationErrorItem) => {
+export const toFieldErrors = (error: ValidationError): GQL_FieldErrors => {
+  const fieldErrors = error.details.map<GQL_FieldError>((err: ValidationErrorItem) => {
     const message = err.message;
     const field = err.path.join('.');
     return {
@@ -19,13 +26,10 @@ export const toResultFieldsError = (error: ValidationError): GqlResult => {
       message,
     };
   });
-  return new GqlResult({
-    success: false,
-    error: {
-      fields: fields,
-      __typename: 'FieldsError',
-    },
-  });
+  return {
+    fieldErrors,
+    __typename: 'FieldErrors',
+  };
 };
 
 export const toObjID = (id: string): mongoose.Types.ObjectId | null => {

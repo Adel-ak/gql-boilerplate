@@ -5,7 +5,7 @@ const options = { abortEarly: false, errors: { wrap: { label: '' } }, allowUnkno
 
 export const loginDtoV = (input: GQL_LoginInput): Joi.ValidationResult => {
   const joiObj: Record<keyof GQL_LoginInput, any> = {
-    email: Joi.string().required().email().label('Email'),
+    userName: Joi.string().required().label('User name'),
     password: Joi.string().required().min(8).label('Password'),
   };
 

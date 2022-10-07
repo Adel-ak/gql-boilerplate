@@ -6,7 +6,7 @@ const options = { abortEarly: false, errors: { wrap: { label: '' } }, allowUnkno
 export const updateProfileDtoV = (input: GQL_UpdateProfileInput): Joi.ValidationResult => {
   const joiObj: Record<keyof GQL_UpdateProfileInput, any> = {
     name: Joi.string().required().min(3).label('Name'),
-    email: Joi.string().required().email().label('Email'),
+    userName: Joi.string().required().label('User name'),
     password: Joi.string().required().min(8).label('Password'),
   };
 

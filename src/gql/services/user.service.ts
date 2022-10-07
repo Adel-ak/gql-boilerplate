@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { Injectable, Scope } from 'graphql-modules';
 import { IUser, UserSchema } from '../../db/schema/user.schema.js';
-import { GQL_FieldsError, GQL_CreateUserInput, GQL_UpdateProfileInput } from '../../generated-types/graphql.js';
+import { GQL_FieldErrors, GQL_CreateUserInput, GQL_UpdateProfileInput } from '../../generated-types/graphql.js';
 import { ReqError } from '../../shared/types/gql.type.js';
 import { GoResponse, TObjectId } from '../../shared/types/index.js';
 import { hashPassword } from './argon2.service.js';
@@ -11,21 +11,30 @@ import { hashPassword } from './argon2.service.js';
   scope: Scope.Singleton,
 })
 export class UserService {
-  findExistingUser = async (input: Partial<IUser>): GoResponse<IUser, GQL_FieldsError | ReqError> => {
+  findOne = async (id: TObjectId): GoResponse<IUser, ReqError> => {
+    try {
+      const userDoc = await UserSchema.findById(id).exec();
+      return [userDoc, null];
+    } catch (err) {
+      return [null, new ReqError({})];
+    }
+  };
+
+  findExistingUser = async (input: Partial<IUser>): GoResponse<IUser, GQL_FieldErrors | ReqError> => {
     try {
       const userDoc = await UserSchema.findOne(input).exec();
       if (userDoc) {
-        const fieldsError: GQL_FieldsError = {
-          fields: [],
-          __typename: 'FieldsError',
+        const fieldErrs: GQL_FieldErrors = {
+          fieldErrors: [],
+          __typename: 'FieldErrors',
         };
-        if (userDoc.email === input.email) {
-          fieldsError.fields.push({
-            field: 'email',
-            message: 'The email is in use by another user.',
+        if (userDoc.userName === input.userName) {
+          fieldErrs.fieldErrors.push({
+            field: 'userName',
+            message: 'The user name is in use by another user.',
           });
         }
-        if (fieldsError.fields.length) return [null, fieldsError];
+        if (fieldErrs.fieldErrors.length) return [null, fieldErrs];
       }
       return [userDoc, null];
     } catch (err) {
@@ -33,7 +42,7 @@ export class UserService {
     }
   };
 
-  createUser = async (input: GQL_CreateUserInput): GoResponse<any, ReqError> => {
+  createUser = async (input: GQL_CreateUserInput): GoResponse<IUser, ReqError> => {
     try {
       const hashedPass = await hashPassword(input.password);
 

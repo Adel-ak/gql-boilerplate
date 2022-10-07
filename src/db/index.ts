@@ -1,10 +1,17 @@
-import pkgMongoose, { ConnectOptions } from 'mongoose';
+import pkgMongoose, { ConnectOptions, SchemaOptions } from 'mongoose';
 import { Env } from '../config/env.js';
 
-const { connect, set } = pkgMongoose;
+const { connect, set, Types } = pkgMongoose;
+
+export const schemaDefaultOptions: SchemaOptions = {
+  timestamps: true,
+  versionKey: '_v',
+};
+
+export const genDefaultID = () => new Types.ObjectId();
 
 export const initDb = async () => {
-  const { IS_DEV, MONGODB_URI } = Env;
+  const { IS_DEV, MONGODB_URI, MONGODB_DEBUG } = Env;
 
   try {
     const options: ConnectOptions = {
@@ -18,7 +25,7 @@ export const initDb = async () => {
 
     await connect(MONGODB_URI, options);
 
-    set('debug', IS_DEV);
+    set('debug', MONGODB_DEBUG);
 
     console.log(`🚀 Connect to DB ${IS_DEV ? MONGODB_URI : 'Prod'}`);
   } catch (err) {

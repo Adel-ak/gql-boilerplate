@@ -10,26 +10,22 @@ export default gql`
   # ***************** Input Types *****************
 
   input LoginInput {
-    email: String!
+    userName: String!
     password: String!
   }
 
   input RefreshSessionInput {
-    accessToken: String!
-    refreshToken: String!
+    accessToken: String
+    refreshToken: String
   }
 
   # ***************** Result Types *****************
 
-  type AuthTokensResult implements Result {
-    success: Boolean!
-    error: ErrorResult
-    data: AuthTokens
-  }
+  union AuthTokensPayload = AuthTokens | ReqError | FieldErrors
 
   extend type Mutation {
-    login(input: LoginInput!): AuthTokensResult!
-    refreshSession(input: RefreshSessionInput!): AuthTokensResult!
+    login(input: LoginInput!): AuthTokensPayload!
+    refreshSession: AuthTokensPayload!
     signOut: Boolean!
   }
 `;

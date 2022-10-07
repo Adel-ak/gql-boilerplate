@@ -4,6 +4,8 @@ import { loadFiles } from '@graphql-tools/load-files';
 import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge';
 import { SessionProvider } from '../services/session.service.js';
 import { AuthProvider } from '../services/auth.service.js';
+import { AuthModule } from './generated-types/module-types.js';
+import isAuthenticated from '../middleware/auth.js';
 
 const dirname = __dirname(import.meta.url);
 
@@ -16,9 +18,10 @@ const [loadedTypeDefs, loadedResolvers] = await Promise.all([
 const typeDefs = mergeTypeDefs(loadedTypeDefs);
 const resolvers = mergeResolvers([...loadedResolvers, {}]);
 
-const middlewares = {
-  Query: {
-    me: [],
+const middlewares: AuthModule.MiddlewareMap = {
+  Mutation: {
+    refreshSession: [isAuthenticated([], { ignoreExpiration: true })],
+    signOut: [isAuthenticated([], { ignoreExpiration: true })],
   },
 };
 

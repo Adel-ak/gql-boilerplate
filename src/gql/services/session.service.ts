@@ -5,9 +5,8 @@ import { SessionSchema } from '../../db/schema/session.schema.js';
 import { IUser, UserSchema } from '../../db/schema/user.schema.js';
 import { GoResponse, ISessionInfo } from '../../shared/types/index.js';
 import { Request } from 'express';
-import { IAuthTokens } from '../../shared/types/auth.type.js';
 import { ReqError } from '../../shared/types/gql.type.js';
-import { GQL_RefreshSessionInput } from '../../generated-types/graphql.js';
+import { GQL_AuthTokens, GQL_RefreshSessionInput } from '../../generated-types/graphql.js';
 import jwt from 'jsonwebtoken';
 import dayjs from 'dayjs';
 
@@ -16,7 +15,7 @@ import dayjs from 'dayjs';
   scope: Scope.Singleton,
 })
 export class SessionService {
-  createSession = async (user: IUser, req: Request): Promise<IAuthTokens> => {
+  createSession = async (user: IUser, req: Request): Promise<GQL_AuthTokens> => {
     const requestInfo: ISessionInfo = {
       ip: req.ip || null,
       userAgent: req.headers['user-agent'] || null,
@@ -36,7 +35,7 @@ export class SessionService {
       _id: user._id,
       deactivated: user.deactivated,
       name: user.name,
-      email: user.email,
+      userName: user.userName,
       role: user.role,
       ast: sessionToken,
       createdAt: user.createdAt,
@@ -118,7 +117,10 @@ export class SessionService {
     }
   };
 
-  async refreshTokenAndSession(refreshTokensDto: GQL_RefreshSessionInput, req: Request): GoResponse<IAuthTokens> {
+  async refreshTokenAndSession(
+    refreshTokensDto: GQL_RefreshSessionInput,
+    req: Request,
+  ): GoResponse<GQL_AuthTokens, ReqError> {
     const reqError = new ReqError({});
 
     try {
@@ -126,9 +128,9 @@ export class SessionService {
 
       const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = Env;
 
-      const userPayLoad = jwt.verify(accessToken, ACCESS_TOKEN_SECRET!, { ignoreExpiration: true }) as jwt.JwtPayload;
+      const userPayLoad = jwt.verify(accessToken!, ACCESS_TOKEN_SECRET!, { ignoreExpiration: true }) as jwt.JwtPayload;
 
-      jwt.verify(refreshToken, REFRESH_TOKEN_SECRET!, { ignoreExpiration: true });
+      jwt.verify(refreshToken!, REFRESH_TOKEN_SECRET!, { ignoreExpiration: true });
 
       const userID = userPayLoad._id;
       const sessionToken = userPayLoad.ast;

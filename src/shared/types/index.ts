@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import { Types } from 'mongoose';
 import { Maybe } from '../../generated-types/graphql.js';
 
@@ -11,3 +12,7 @@ export interface ISessionInfo {
 }
 
 export type GoResponse<R = any, E = any> = Promise<[Maybe<R>, Maybe<E>]>;
+
+export interface IRequest extends Request {
+  cookies: { accessToken?: string; refreshToken?: string };
+}

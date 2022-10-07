@@ -7,9 +7,7 @@ const Prod = {
   AWS_S3_URL: Joi.string().required(),
 };
 
-const Dev = {
-  LOCAL_IMAGE_URL: Joi.string(),
-};
+const Dev = {};
 
 const defaultSchema = {
   PORT: Joi.number().required(),
@@ -33,9 +31,11 @@ const defaultSchema = {
   GQL_PLAYGROUND: Joi.bool().required(),
 
   //
-  AWS_S3_BUCKET: Joi.string().required(),
-  AWS_ACCESS_KEY_ID: Joi.string().required(),
-  AWS_SECRET_ACCESS_KEY: Joi.string().required(),
+  ACCESS_TOKEN_SECRET: Joi.string().required(),
+  ACCESS_TOKEN_EXPIRY: Joi.string().required(),
+  REFRESH_TOKEN_SECRET: Joi.string().required(),
+  REFRESH_TOKEN_EXPIRY: Joi.string().required(),
+  SESSION_EXPIRY: Joi.string().required(),
 };
 
 export const validateEnv = async (): Promise<Joi.ValidationError | null> => {

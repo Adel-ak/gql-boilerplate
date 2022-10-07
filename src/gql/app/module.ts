@@ -5,7 +5,9 @@ import { __dirname } from '../../utils/path.js';
 import { loadFiles } from '@graphql-tools/load-files';
 import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge';
 import isAuthenticated from '../middleware/auth.js';
-import { ERoles } from '../../shared/enums.js';
+import { AppProvider } from '../services/app.service.js';
+import { AppModule } from './generated-types/module-types.js';
+import { GQL_ERoles } from '../../generated-types/graphql.js';
 
 const dirname = __dirname(import.meta.url);
 
@@ -15,15 +17,25 @@ const [loadedTypeDefs, loadedResolvers] = await Promise.all([
   loadFiles(`${dirname}/*{query,mutation,subscription}.{js,ts}`),
 ]);
 
-const typeDefs = mergeTypeDefs(loadedTypeDefs);
-const resolvers = mergeResolvers([...loadedResolvers, scalarResolvers, { Upload: GraphQLUpload }]);
+const { DateTime, ObjectID, JSON } = scalarResolvers;
 
-const middlewares = {
+const typeDefs = mergeTypeDefs(loadedTypeDefs);
+const resolvers = mergeResolvers([
+  ...loadedResolvers,
+  {
+    Upload: GraphQLUpload,
+    DateTime,
+    ObjectID,
+    JSON,
+  },
+]);
+
+const middlewares: AppModule.MiddlewareMap = {
   Query: {
-    me: [],
+    getAppProperties: [isAuthenticated([GQL_ERoles.Admin])],
   },
   Mutation: {
-    _empty: [isAuthenticated([ERoles.User])],
+    updateAppProperties: [isAuthenticated([GQL_ERoles.Admin])],
   },
 };
 
@@ -33,4 +45,5 @@ export const appModule = createModule({
   typeDefs,
   resolvers,
   middlewares,
+  providers: [AppProvider],
 });

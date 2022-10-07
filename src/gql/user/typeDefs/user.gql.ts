@@ -6,7 +6,7 @@ export default gql`
   type User {
     _id: ObjectID!
     name: String!
-    email: EmailAddress!
+    userName: String!
     deactivated: Boolean!
     role: ERoles!
     createdAt: DateTime!
@@ -18,27 +18,31 @@ export default gql`
 
   input CreateUserInput {
     name: String!
-    email: String!
+    userName: String!
     password: String!
     role: ERoles!
   }
 
   input UpdateProfileInput {
-    name: String!
-    email: String!
+    userName: String!
     password: String!
   }
 
   # ***************** Result Types *****************
 
-  type UserResult implements Result {
-    success: Boolean!
-    error: ErrorResult
-    data: User
+  union UserPayload = User | ReqError | FieldErrors
+
+  union MePayload = User | ReqError
+
+  # ***************** Root Types *****************
+
+  extend type Query {
+    me: MePayload!
+    updateProfile(input: UpdateProfileInput!): UserPayload!
   }
 
   extend type Mutation {
-    createUser(input: CreateUserInput!): UserResult
-    updateProfile(input: UpdateProfileInput!): UserResult
+    createUser(input: CreateUserInput!): UserPayload!
+    updateProfile(input: UpdateProfileInput!): UserPayload!
   }
 `;

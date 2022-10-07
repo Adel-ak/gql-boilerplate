@@ -2,7 +2,7 @@ import { Injectable, Scope } from 'graphql-modules';
 import jwt from 'jsonwebtoken';
 import { Env } from '../../config/env.js';
 import { IUser, UserSchema } from '../../db/schema/user.schema.js';
-import { GQL_FieldsError, GQL_LoginInput } from '../../generated-types/graphql.js';
+import { GQL_FieldErrors, GQL_LoginInput } from '../../generated-types/graphql.js';
 import { ReqError } from '../../shared/types/gql.type.js';
 import { GoResponse } from '../../shared/types/index.js';
 import { comparePass } from './argon2.service.js';
@@ -12,54 +12,50 @@ import { comparePass } from './argon2.service.js';
   scope: Scope.Singleton,
 })
 export class AuthService {
-  verifyLogin = async (input: GQL_LoginInput): GoResponse<IUser, GQL_FieldsError | ReqError> => {
+  verifyLogin = async (input: GQL_LoginInput): GoResponse<IUser, GQL_FieldErrors | ReqError> => {
     try {
-      const user = await UserSchema.findOne({ email: input.email }).exec();
-      const fieldsErr: GQL_FieldsError = {
-        fields: [],
-        __typename: 'FieldsError',
+      const user = await UserSchema.findOne({ userName: input.userName }).exec();
+      const fieldErrors: GQL_FieldErrors = {
+        fieldErrors: [],
+        __typename: 'FieldErrors',
       };
       if (user) {
         const doesPassMatch = await comparePass(user.password, input.password);
         if (doesPassMatch) {
           return [user, null];
         } else {
-          fieldsErr.fields.push({
+          fieldErrors.fieldErrors.push({
             field: 'password',
             message: 'Invalid password',
           });
         }
       } else {
-        fieldsErr.fields.push({
-          field: 'email',
+        fieldErrors.fieldErrors.push({
+          field: 'userName',
           message: 'User not found.',
         });
       }
 
-      return [null, fieldsErr];
+      return [null, fieldErrors];
     } catch (err) {
       return [null, new ReqError({})];
     }
   };
 
   validateToken = async (
-    authorization: string | undefined,
+    authorization?: string,
     jwtOptions: jwt.VerifyOptions = {},
   ): GoResponse<jwt.JwtPayload, ReqError> => {
     try {
-      if (authorization && typeof authorization === 'string' && authorization !== 'null' && authorization !== null) {
-        if (authorization.startsWith('Bearer')) {
-          const { ACCESS_TOKEN_SECRET } = Env;
-          const token = authorization.split(' ')[1];
-          const decodedToken = jwt.verify(token, ACCESS_TOKEN_SECRET!, jwtOptions) as jwt.JwtPayload;
+      if (authorization) {
+        const { ACCESS_TOKEN_SECRET } = Env;
 
-          return [decodedToken, null];
-        }
+        const decodedToken = jwt.verify(authorization, ACCESS_TOKEN_SECRET!, jwtOptions) as jwt.JwtPayload;
 
-        return [null, new ReqError({ message: 'Invalid token' })];
+        return [decodedToken, null];
       }
 
-      return [null, new ReqError({ message: 'You must be logged in' })];
+      return [null, new ReqError({ message: 'You must be logged in', code: 'UNAUTHENTICATED' })];
     } catch (err) {
       const reqError = new ReqError({});
 
@@ -67,10 +63,13 @@ export class AuthService {
         switch (err.message) {
           case 'jwt expired':
             reqError.message = 'Token expired';
+            reqError.code = 'TOKEN_EXPIRED';
+
             break;
           case 'invalid signature':
           case 'jwt malformed':
             reqError.message = 'Invalid token';
+            reqError.code = 'INVALID_TOKEN';
             break;
         }
       }
