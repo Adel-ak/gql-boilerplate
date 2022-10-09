@@ -12,6 +12,8 @@ import { Server } from 'http';
 import { parse } from 'url';
 import { startApolloSocketServer } from './ws.js';
 import { Env } from '../config/env.js';
+import { clientLoader } from '../gql/loader/client.loader.js';
+import { watchLoader } from '../gql/loader/watch.loader.js';
 
 export const startApolloServer = async (
   schema: GraphQLSchema,
@@ -55,7 +57,11 @@ export const startApolloServer = async (
         return response;
       },
       context: (ctx) => {
-        return { ...ctx };
+        const loaders = {
+          clientLoader: clientLoader(),
+          watchLoader: watchLoader(),
+        };
+        return { ...ctx, loaders };
       },
     });
 

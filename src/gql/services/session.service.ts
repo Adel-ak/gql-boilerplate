@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 import { Injectable, Scope } from 'graphql-modules';
 import { Env } from '../../config/env.js';
-import { SessionSchema } from '../../db/schema/session.schema.js';
-import { IUser, UserSchema } from '../../db/schema/user.schema.js';
+import { SessionModel } from '../../db/model/session.model.js';
+import { IUser, UserModel } from '../../db/model/user.model.js';
 import { GoResponse, ISessionInfo } from '../../shared/types/index.js';
 import { Request } from 'express';
 import { ReqError } from '../../shared/types/gql.type.js';
@@ -74,7 +74,7 @@ export class SessionService {
 
   makeSession = async (user: IUser, requestInfo: ISessionInfo) => {
     const sessionToken = this.createSessionToken();
-    const session = await new SessionSchema({
+    const session = await new SessionModel({
       userID: user._id,
       userRole: user.role,
       token: sessionToken,
@@ -84,7 +84,7 @@ export class SessionService {
   };
 
   findSessionByToken = (sessionToken: string) => {
-    return SessionSchema.findOne({ token: sessionToken }).exec();
+    return SessionModel.findOne({ token: sessionToken }).exec();
   };
 
   validateSession = async (decodedToken: jwt.JwtPayload): GoResponse<IUser, ReqError> => {
@@ -93,7 +93,7 @@ export class SessionService {
       const session = await this.findSessionByToken(decodedToken.ast);
       if (session) {
         if (session.valid) {
-          const user = await UserSchema.findById(session.userID).exec();
+          const user = await UserModel.findById(session.userID).exec();
 
           if (user) {
             return [user.toObject(), null];
@@ -137,7 +137,7 @@ export class SessionService {
       const session = await this.findSessionByToken(sessionToken);
 
       if (session) {
-        const user = await UserSchema.findById(userID).exec();
+        const user = await UserModel.findById(userID).exec();
 
         if (user) {
           const requestInfo: ISessionInfo = {

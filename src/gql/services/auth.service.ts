@@ -1,7 +1,7 @@
 import { Injectable, Scope } from 'graphql-modules';
 import jwt from 'jsonwebtoken';
 import { Env } from '../../config/env.js';
-import { IUser, UserSchema } from '../../db/schema/user.schema.js';
+import { IUser, UserModel } from '../../db/model/user.model.js';
 import { GQL_FieldErrors, GQL_LoginInput } from '../../generated-types/graphql.js';
 import { ReqError } from '../../shared/types/gql.type.js';
 import { GoResponse } from '../../shared/types/index.js';
@@ -14,7 +14,7 @@ import { comparePass } from './argon2.service.js';
 export class AuthService {
   verifyLogin = async (input: GQL_LoginInput): GoResponse<IUser, GQL_FieldErrors | ReqError> => {
     try {
-      const user = await UserSchema.findOne({ userName: input.userName }).exec();
+      const user = await UserModel.findOne({ userName: input.userName }).exec();
       const fieldErrors: GQL_FieldErrors = {
         fieldErrors: [],
         __typename: 'FieldErrors',

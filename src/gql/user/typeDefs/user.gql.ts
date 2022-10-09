@@ -1,4 +1,5 @@
 import { gql } from 'apollo-server-core';
+import { GQL_Paginate } from '../../../shared/types/gql.type.js';
 
 export default gql`
   # ***************** Types *****************
@@ -9,6 +10,7 @@ export default gql`
     userName: String!
     deactivated: Boolean!
     role: ERoles!
+    store: StoreLocation!
     createdAt: DateTime!
     updatedAt: DateTime
     _v: Int!
@@ -21,11 +23,30 @@ export default gql`
     userName: String!
     password: String!
     role: ERoles!
+    store: StoreLocationInput!
+  }
+
+  input UpdateUserInput {
+    _id: ObjectID!
+    name: String
+    userName: String
+    password: String
+    role: ERoles
+    store: StoreLocationInput
+    deactivated: Boolean
   }
 
   input UpdateProfileInput {
     userName: String!
     password: String!
+  }
+
+  input ListUsersFilterInput {
+    role: ERoles
+    name: String
+    userName: String
+    deactivated:  Boolean
+    storeCode: String
   }
 
   # ***************** Result Types *****************
@@ -34,15 +55,21 @@ export default gql`
 
   union MePayload = User | ReqError
 
+  type ListUsersResult {
+    ${GQL_Paginate}
+    docs: [User]!
+  }
+
   # ***************** Root Types *****************
 
   extend type Query {
     me: MePayload!
-    updateProfile(input: UpdateProfileInput!): UserPayload!
+    listUsers(filter: ListUsersFilterInput!, options: PaginateOptions!): ListUsersResult!
   }
 
   extend type Mutation {
     createUser(input: CreateUserInput!): UserPayload!
     updateProfile(input: UpdateProfileInput!): UserPayload!
+    updateUser(input: UpdateUserInput!): UserPayload!
   }
 `;

@@ -6,6 +6,7 @@ import { genDefaultID, schemaDefaultOptions } from '../index.js';
 
 const { Schema, model } = mongoose;
 const { SESSION_EXPIRY } = Env;
+
 export interface ISession {
   _id: TObjectId;
   userID: TObjectId;
@@ -35,4 +36,4 @@ const SchemaDef = new Schema<ISession>(
   schemaDefaultOptions,
 );
 
-export const SessionSchema = model<ISession>('sessions', SchemaDef);
+export const SessionModel = model<ISession>('sessions', SchemaDef);

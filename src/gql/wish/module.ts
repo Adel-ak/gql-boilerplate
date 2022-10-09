@@ -2,8 +2,9 @@ import { createModule } from 'graphql-modules';
 import { __dirname } from '../../utils/path.js';
 import { loadFiles } from '@graphql-tools/load-files';
 import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge';
-import { UserProvider } from '../services/user.service.js';
-import { WishListModule } from './generated-types/module-types.js';
+import { WishModule } from './generated-types/module-types.js';
+import { WishProvider } from '../services/waitList.service.js';
+import isAuthenticated from '../middleware/auth.js';
 
 const dirname = __dirname(import.meta.url);
 
@@ -16,13 +17,17 @@ const [loadedTypeDefs, loadedResolvers] = await Promise.all([
 const typeDefs = mergeTypeDefs(loadedTypeDefs);
 const resolvers = mergeResolvers([...loadedResolvers, {}]);
 
-const middlewares: WishListModule.MiddlewareMap = {};
+const middlewares: WishModule.MiddlewareMap = {
+  Mutation: {
+    addToWishList: [isAuthenticated()],
+  },
+};
 
-export const wishListModule = createModule({
-  id: 'wish-list-module',
+export const wishModule = createModule({
+  id: 'wish-module',
   dirname: __dirname(import.meta.url),
   typeDefs,
   resolvers,
   middlewares,
-  providers: [UserProvider],
+  providers: [WishProvider],
 });

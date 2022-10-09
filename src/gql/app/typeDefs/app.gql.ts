@@ -17,7 +17,7 @@ export default gql`
     stack: JSON
   }
 
-  type StoreBranches {
+  type StoreLocation {
     code: String!
     name: String!
   }
@@ -26,7 +26,7 @@ export default gql`
     _id: ObjectID!
     maxWishPerClient: Int!
     roles: [String!]!
-    branches: [StoreBranches!]!
+    stores: [StoreLocation!]!
     createdAt: DateTime!
     updatedAt: DateTime
     _v: Int!
@@ -42,8 +42,19 @@ export default gql`
 
   # ***************** Input Types *****************
 
+  input PaginateOptions {
+    page: Int
+    limit: Int
+    sort: JSON
+  }
+
   input UpdateAppPropertiesInput {
     maxWishPerClient: Int!
+  }
+
+  input StoreLocationInput {
+    code: String!
+    name: String!
   }
 
   # ***************** Root Types *****************

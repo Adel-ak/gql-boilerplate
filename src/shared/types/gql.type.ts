@@ -23,3 +23,15 @@ export class ReqError implements GQL_ReqError {
   stack: any;
   __typename: 'ReqError';
 }
+
+export const GQL_Paginate = `
+  totalDocs: Int!
+  limit: Int!
+  page: Int!
+  totalPages: Int!
+  hasNextPage: Boolean
+  nextPage: Int
+  hasPrevPage: Boolean
+  prevPage: Int
+  pagingCounter: Int!
+`;

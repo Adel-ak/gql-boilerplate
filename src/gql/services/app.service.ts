@@ -1,5 +1,5 @@
 import { Injectable, Scope } from 'graphql-modules';
-import { AppPropertiesSchema } from '../../db/schema/appProperties.schema.js';
+import { AppPropertiesModel, IAppProperties } from '../../db/model/appProperties.model.js';
 import { GQL_UpdateAppPropertiesInput } from '../../generated-types/graphql.js';
 
 @Injectable({
@@ -7,9 +7,9 @@ import { GQL_UpdateAppPropertiesInput } from '../../generated-types/graphql.js';
   scope: Scope.Singleton,
 })
 export class AppService {
-  getProperties = () => AppPropertiesSchema.findOne().exec();
-  updateProperties = (input: GQL_UpdateAppPropertiesInput) => {
-    return AppPropertiesSchema.findOneAndUpdate({}, input, { new: true }).exec();
+  getProperties = (): Promise<IAppProperties | null> => AppPropertiesModel.findOne({}).exec();
+  updateProperties = (input: GQL_UpdateAppPropertiesInput): Promise<IAppProperties | null> => {
+    return AppPropertiesModel.findOneAndUpdate({}, input, { new: true }).exec();
   };
 }
 

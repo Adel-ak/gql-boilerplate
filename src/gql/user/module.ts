@@ -24,6 +24,7 @@ const middlewares: UserModule.MiddlewareMap = {
   Mutation: {
     createUser: [isAuthenticated([Admin, Manager])],
     updateProfile: [isAuthenticated()],
+    updateUser: [isAuthenticated([Admin, Manager])],
   },
   Query: {
     me: [isAuthenticated()],

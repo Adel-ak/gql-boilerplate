@@ -1,11 +1,14 @@
-import mongoose from 'mongoose';
+import mongoose, { AggregatePaginateModel, PaginateModel, Document } from 'mongoose';
 import { GQL_Watch } from '../../generated-types/graphql.js';
 import { genDefaultID, schemaDefaultOptions } from '../index.js';
 import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 const { Schema, model } = mongoose;
 
 export interface IWatch extends GQL_Watch {}
+
+interface IWatchDocument extends IWatch, Omit<Document, '_id'> {}
 
 const SchemaDef = new Schema<IWatch>(
   {
@@ -20,4 +23,9 @@ const SchemaDef = new Schema<IWatch>(
   schemaDefaultOptions,
 );
 
-export const WatchSchema = model<IWatch>('watches', SchemaDef);
+SchemaDef.plugin(aggregatePaginate);
+SchemaDef.plugin(mongoosePaginate);
+
+type ModelPlugins = AggregatePaginateModel<IWatchDocument> & PaginateModel<IWatchDocument>;
+
+export const WatchModel = model<IWatchDocument, ModelPlugins>('watches', SchemaDef);

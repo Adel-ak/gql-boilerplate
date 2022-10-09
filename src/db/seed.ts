@@ -1,13 +1,13 @@
 import pkgMongoose, { ConnectOptions } from 'mongoose';
 import { Env } from '../config/env.js';
 import faker from 'faker';
-import { IUser, UserSchema } from './schema/user.schema.js';
+import { IUser, UserModel } from './model/user.model.js';
 import { hashPassword } from '../gql/services/argon2.service.js';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
 import { enumValues, randNum } from '../utils/index.js';
-import { ClientSchema, IClient } from './schema/client.schema.js';
-import { IWatch, WatchSchema } from './schema/watch.schema.js';
+import { ClientModel, IClient } from './model/client.model.js';
+import { IWatch, WatchModel } from './model/watch.model.js';
 import { GQL_ERoles } from '../generated-types/graphql.js';
 
 dayjs.extend(utc);
@@ -42,6 +42,24 @@ export const runSeed = async () => {
 const seedUsers = async (size: number) => {
   try {
     const password = await hashPassword('rolexDemo');
+    const stores = [
+      {
+        code: '01',
+        name: 'Salhiya',
+      },
+      {
+        code: '05',
+        name: 'Avenues',
+      },
+      {
+        code: '06',
+        name: 'GateMall',
+      },
+      {
+        code: '08',
+        name: 'AssimaMall',
+      },
+    ];
 
     const promise = [...Array(size)].map<Promise<IUser>>(async () => {
       const firstName = faker.name.firstName();
@@ -52,6 +70,7 @@ const seedUsers = async (size: number) => {
         userName,
         password,
         role,
+        store: stores[randNum(0, stores.length - 1)],
         _id: new Types.ObjectId(),
         deactivated: faker.datatype.boolean(),
         name: `${firstName} ${lastName}`,
@@ -61,7 +80,7 @@ const seedUsers = async (size: number) => {
     });
     const users = await Promise.all(promise);
 
-    await UserSchema.insertMany(users, { ordered: false });
+    await UserModel.insertMany(users, { ordered: false });
 
     console.log(`🚀 Users seeded`);
   } catch (err) {}
@@ -85,7 +104,7 @@ const seedClients = async (size: number) => {
       };
     });
 
-    await ClientSchema.insertMany(clients, { ordered: false });
+    await ClientModel.insertMany(clients, { ordered: false });
 
     console.log(`🚀 Clients seeded`);
   } catch (err) {}
@@ -111,7 +130,7 @@ const seedWatches = async () => {
       };
     });
 
-    await WatchSchema.insertMany(watches, { ordered: false });
+    await WatchModel.insertMany(watches, { ordered: false });
 
     console.log(`🚀 Watches seeded`);
   } catch (err) {}

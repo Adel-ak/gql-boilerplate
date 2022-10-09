@@ -33,9 +33,10 @@ export const toFieldErrors = (error: ValidationError): GQL_FieldErrors => {
 };
 
 export const toObjID = (id: string): mongoose.Types.ObjectId | null => {
-  const isValid = Types.ObjectId.isValid(id);
-  if (isValid) {
+  if (isValidObjectID(id)) {
     return new Types.ObjectId(id);
   }
   return null;
 };
+
+export const isValidObjectID = (value: any) => Types.ObjectId.isValid(value);
