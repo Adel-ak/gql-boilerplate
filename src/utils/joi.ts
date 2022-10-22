@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 const { Types } = mongoose;
 const options = { abortEarly: false, errors: { wrap: { label: '' } }, allowUnknown: true };
 
-export const JoiIsObjectID = (value: string, helper: CustomHelpers) => {
+export const JoiIsObjectId = (value: string, helper: CustomHelpers) => {
   const isValid = Types.ObjectId.isValid(value);
 
   if (!isValid) {
@@ -28,9 +28,9 @@ export const JoiNoSpace = (value: string, helper: CustomHelpers) => {
   return value;
 };
 
-export const validateObjectID = (id: string): ValidationResult => {
+export const validateObjectId = (id: string): ValidationResult => {
   const joiObj = {
-    id: Joi.custom(JoiIsObjectID).required().label('ID'),
+    id: Joi.custom(JoiIsObjectId).required().label('ID'),
   };
 
   return Joi.object(joiObj).validate({ id }, { ...options });

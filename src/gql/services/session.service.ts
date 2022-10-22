@@ -3,7 +3,7 @@ import { Injectable, Scope } from 'graphql-modules';
 import { Env } from '../../config/env.js';
 import { SessionModel } from '../../db/model/session.model.js';
 import { IUser, UserModel } from '../../db/model/user.model.js';
-import { GoResponse, ISessionInfo } from '../../shared/types/index.js';
+import { GoResponse, ISessionInfo, TObjectId } from '../../shared/types/index.js';
 import { Request } from 'express';
 import { ReqError } from '../../shared/types/gql.type.js';
 import { GQL_AuthTokens, GQL_RefreshSessionInput } from '../../generated-types/graphql.js';
@@ -33,13 +33,7 @@ export class SessionService {
 
     const payload = {
       _id: user._id,
-      deactivated: user.deactivated,
-      name: user.name,
-      userName: user.userName,
-      role: user.role,
       ast: sessionToken,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
     };
 
     const jwtOptions: jwt.SignOptions = {
@@ -75,7 +69,7 @@ export class SessionService {
   makeSession = async (user: IUser, requestInfo: ISessionInfo) => {
     const sessionToken = this.createSessionToken();
     const session = await new SessionModel({
-      userID: user._id,
+      userId: user._id,
       userRole: user.role,
       token: sessionToken,
       ...requestInfo,
@@ -87,16 +81,22 @@ export class SessionService {
     return SessionModel.findOne({ token: sessionToken }).exec();
   };
 
+  invalidateSessionsByUserId = async (userId: TObjectId) => {
+    try {
+      await SessionModel.updateMany({ userId }, { $set: { valid: false } }).exec();
+    } catch {}
+  };
+
   validateSession = async (decodedToken: jwt.JwtPayload): GoResponse<IUser, ReqError> => {
     const reqError = new ReqError({});
     try {
       const session = await this.findSessionByToken(decodedToken.ast);
       if (session) {
         if (session.valid) {
-          const user = await UserModel.findById(session.userID).exec();
+          const user = await UserModel.findById(session.userId).exec();
 
           if (user) {
-            return [user.toObject(), null];
+            return [user, null];
           }
 
           reqError.message = 'Session was found but no user data';
@@ -104,12 +104,12 @@ export class SessionService {
           return [null, reqError];
         }
 
-        reqError.message = 'User session is not valid';
+        reqError.message = 'Session is not valid';
 
         return [null, reqError];
       }
 
-      reqError.message = 'User session not found';
+      reqError.message = 'Session not found';
 
       return [null, reqError];
     } catch (err) {
@@ -132,12 +132,12 @@ export class SessionService {
 
       jwt.verify(refreshToken!, REFRESH_TOKEN_SECRET!, { ignoreExpiration: true });
 
-      const userID = userPayLoad._id;
+      const userId = userPayLoad._id;
       const sessionToken = userPayLoad.ast;
       const session = await this.findSessionByToken(sessionToken);
 
       if (session) {
-        const user = await UserModel.findById(userID).exec();
+        const user = await UserModel.findById(userId).exec();
 
         if (user) {
           const requestInfo: ISessionInfo = {

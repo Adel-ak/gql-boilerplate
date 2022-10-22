@@ -8,12 +8,16 @@ export default gql`
     _id: ObjectID!
     name: String!
     userName: String!
-    deactivated: Boolean!
+    active: Boolean!
     role: ERoles!
-    store: StoreLocation!
+    store: String
     createdAt: DateTime!
     updatedAt: DateTime
     _v: Int!
+  }
+
+  type ToggleUserActivationResult {
+    data: Boolean!
   }
 
   # ***************** Input Types *****************
@@ -23,7 +27,7 @@ export default gql`
     userName: String!
     password: String!
     role: ERoles!
-    store: StoreLocationInput!
+    store: String
   }
 
   input UpdateUserInput {
@@ -32,8 +36,7 @@ export default gql`
     userName: String
     password: String
     role: ERoles
-    store: StoreLocationInput
-    deactivated: Boolean
+    store: String
   }
 
   input UpdateProfileInput {
@@ -41,12 +44,31 @@ export default gql`
     password: String!
   }
 
+  input ListUsersInput {
+    search: String
+    filter: ListUsersFilterInput
+    options: ListUsersOptionsInput
+  }
+
   input ListUsersFilterInput {
     role: ERoles
-    name: String
-    userName: String
-    deactivated:  Boolean
-    storeCode: String
+    active:  Boolean
+    store: String
+  }
+
+  input ListUsersOptionsInput {
+    page: Int
+    limit: Int
+    sort: ListUsersSort
+  }
+
+  input ListUsersSort {
+    role: Sort
+    name: Sort
+    userName: Sort
+    active:  Sort
+    store: Sort
+    createdAt: Sort
   }
 
   # ***************** Result Types *****************
@@ -55,21 +77,24 @@ export default gql`
 
   union MePayload = User | ReqError
 
+  union ToggleUserActivationPayload = User | ReqError
+
   type ListUsersResult {
     ${GQL_Paginate}
-    docs: [User]!
+    docs: [User!]!
   }
 
   # ***************** Root Types *****************
 
   extend type Query {
     me: MePayload!
-    listUsers(filter: ListUsersFilterInput!, options: PaginateOptions!): ListUsersResult!
+    listUsers(input:ListUsersInput): ListUsersResult!
   }
 
   extend type Mutation {
     createUser(input: CreateUserInput!): UserPayload!
     updateProfile(input: UpdateProfileInput!): UserPayload!
     updateUser(input: UpdateUserInput!): UserPayload!
+    toggleUserActivation(_id: ObjectID!, active: Boolean!): ToggleUserActivationPayload!
   }
 `;

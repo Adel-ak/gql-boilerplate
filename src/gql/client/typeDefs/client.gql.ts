@@ -14,4 +14,16 @@ export default gql`
     updatedAt: DateTime
     _v: Int!
   }
+
+  # ***************** Input Types *****************
+
+  input FilterClientsInput {
+    search: String!
+  }
+
+  # ***************** Root Types *****************
+
+  extend type Query {
+    filterClients(input: FilterClientsInput!): [Client!]!
+  }
 `;

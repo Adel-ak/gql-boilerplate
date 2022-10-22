@@ -25,9 +25,11 @@ const middlewares: UserModule.MiddlewareMap = {
     createUser: [isAuthenticated([Admin, Manager])],
     updateProfile: [isAuthenticated()],
     updateUser: [isAuthenticated([Admin, Manager])],
+    toggleUserActivation: [isAuthenticated([Admin, Manager])],
   },
   Query: {
     me: [isAuthenticated()],
+    listUsers: [isAuthenticated([Admin, Manager])],
   },
 };
 

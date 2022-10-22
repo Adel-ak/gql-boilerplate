@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { Env } from '../../config/env.js';
 import { IUser, UserModel } from '../../db/model/user.model.js';
 import { GQL_FieldErrors, GQL_LoginInput } from '../../generated-types/graphql.js';
-import { ReqError } from '../../shared/types/gql.type.js';
+import { FieldErrors, ReqError } from '../../shared/types/gql.type.js';
 import { GoResponse } from '../../shared/types/index.js';
 import { comparePass } from './argon2.service.js';
 
@@ -15,28 +15,25 @@ export class AuthService {
   verifyLogin = async (input: GQL_LoginInput): GoResponse<IUser, GQL_FieldErrors | ReqError> => {
     try {
       const user = await UserModel.findOne({ userName: input.userName }).exec();
-      const fieldErrors: GQL_FieldErrors = {
-        fieldErrors: [],
-        __typename: 'FieldErrors',
-      };
+      const fe = new FieldErrors();
       if (user) {
         const doesPassMatch = await comparePass(user.password, input.password);
         if (doesPassMatch) {
           return [user, null];
         } else {
-          fieldErrors.fieldErrors.push({
+          fe.fieldErrors.push({
             field: 'password',
             message: 'Invalid password',
           });
         }
       } else {
-        fieldErrors.fieldErrors.push({
+        fe.fieldErrors.push({
           field: 'userName',
           message: 'User not found.',
         });
       }
 
-      return [null, fieldErrors];
+      return [null, fe];
     } catch (err) {
       return [null, new ReqError({})];
     }

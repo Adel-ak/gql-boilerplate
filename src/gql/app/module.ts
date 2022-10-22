@@ -8,6 +8,7 @@ import isAuthenticated from '../middleware/auth.js';
 import { AppProvider } from '../services/app.service.js';
 import { AppModule } from './generated-types/module-types.js';
 import { GQL_ERoles } from '../../generated-types/graphql.js';
+import { JSONScalarType } from '../../shared/scalars.js';
 
 const dirname = __dirname(import.meta.url);
 
@@ -17,7 +18,7 @@ const [loadedTypeDefs, loadedResolvers] = await Promise.all([
   loadFiles(`${dirname}/*{query,mutation,subscription}.{js,ts}`),
 ]);
 
-const { DateTime, ObjectID, JSON } = scalarResolvers;
+const { DateTime, ObjectID } = scalarResolvers;
 
 const typeDefs = mergeTypeDefs(loadedTypeDefs);
 const resolvers = mergeResolvers([
@@ -26,16 +27,18 @@ const resolvers = mergeResolvers([
     Upload: GraphQLUpload,
     DateTime,
     ObjectID,
-    JSON,
+    JSON: JSONScalarType,
   },
 ]);
 
+const { Admin } = GQL_ERoles;
+
 const middlewares: AppModule.MiddlewareMap = {
   Query: {
-    getAppProperties: [isAuthenticated([GQL_ERoles.Admin])],
+    getAppProperties: [isAuthenticated()],
   },
   Mutation: {
-    updateAppProperties: [isAuthenticated([GQL_ERoles.Admin])],
+    updateAppProperties: [isAuthenticated([Admin])],
   },
 };
 

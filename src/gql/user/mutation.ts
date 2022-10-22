@@ -1,6 +1,7 @@
-import { GQL_MutationResolvers } from '../../generated-types/graphql.js';
+import { GQL_ERoles, GQL_FieldErrors, GQL_MutationResolvers } from '../../generated-types/graphql.js';
 import { ReqError } from '../../shared/types/gql.type.js';
 import { toFieldErrors } from '../../utils/index.js';
+import { SessionService } from '../services/session.service.js';
 import { UserService } from '../services/user.service.js';
 import { createUserDtoV } from './dto/create-user.dto.js';
 import { updateProfileDtoV } from './dto/update-profile.dto.js';
@@ -15,10 +16,6 @@ export const Mutation: GQL_MutationResolvers = {
     }
 
     const userService = injector.get(UserService);
-
-    const existingUserErr = (await userService.findExistingUser({ userName: input.userName }))[1];
-
-    if (existingUserErr) return existingUserErr;
 
     const [user, err] = await userService.createUser(input);
 
@@ -48,12 +45,24 @@ export const Mutation: GQL_MutationResolvers = {
   },
 
   updateUser: async (_, { input }, { injector, authUser }) => {
-    const { _id, ...restInput } = input;
+    const { _id } = input;
 
     if (authUser!._id.equals(_id)) {
       return new ReqError({
         message: "Use 'updateProfile' mutation to update your account",
       });
+    }
+    const { Admin } = GQL_ERoles;
+    if (authUser?.role !== Admin && input.role === Admin) {
+      return {
+        fieldErrors: [
+          {
+            field: 'role',
+            message: "Only a 'Admin' user can assign a user as admin",
+          },
+        ],
+        __typename: 'FieldErrors',
+      } as GQL_FieldErrors;
     }
 
     const { error } = updateUserDtoV(input);
@@ -62,20 +71,41 @@ export const Mutation: GQL_MutationResolvers = {
       return toFieldErrors(error);
     }
 
-    if (Object.keys(restInput).length > 0) {
-      const userService = injector.get(UserService);
+    const userService = injector.get(UserService);
 
-      const [user, err] = await userService.updateUser(input);
+    const [user, err] = await userService.updateUser(input);
 
-      if (err) return err;
+    if (err) return err;
 
-      user!.__typename = 'User';
+    user!.__typename = 'User';
 
-      return user!;
+    if (input.password) {
+      const { invalidateSessionsByUserId } = injector.get(SessionService);
+      await invalidateSessionsByUserId(_id);
     }
 
-    return new ReqError({
-      message: 'No fields specified for update to take place',
-    });
+    return user!;
+  },
+  toggleUserActivation: async (_, { _id, active }, { injector, authUser }) => {
+    if (authUser!._id.equals(_id)) {
+      return new ReqError({
+        message: 'You can not activate or deactivate your own account',
+      });
+    }
+
+    const userService = injector.get(UserService);
+
+    const [user, err] = await userService.toggleUserActivation(_id, active);
+
+    if (err) return err;
+
+    user!.__typename = 'User';
+
+    if (!active) {
+      const { invalidateSessionsByUserId } = injector.get(SessionService);
+      await invalidateSessionsByUserId(_id);
+    }
+
+    return user!;
   },
 };

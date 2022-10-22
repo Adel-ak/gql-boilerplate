@@ -8,7 +8,7 @@ export const schemaDefaultOptions: SchemaOptions = {
   versionKey: '_v',
 };
 
-export const genDefaultID = () => new Types.ObjectId();
+export const genDefaultId = () => new Types.ObjectId();
 
 export const initDb = async () => {
   const { IS_DEV, MONGODB_URI, MONGODB_DEBUG } = Env;

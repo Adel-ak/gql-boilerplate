@@ -12,4 +12,16 @@ export default gql`
     updatedAt: DateTime
     _v: Int!
   }
+
+  # ***************** Input Types *****************
+
+  input FilterWatchesInput {
+    search: String!
+  }
+
+  # ***************** Root Types *****************
+
+  extend type Query {
+    filterWatches(input: FilterWatchesInput!): [Watch!]!
+  }
 `;

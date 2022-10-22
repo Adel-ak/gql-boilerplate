@@ -17,19 +17,16 @@ export default gql`
     stack: JSON
   }
 
-  type StoreLocation {
-    code: String!
-    name: String!
-  }
-
   type AppProperties {
-    _id: ObjectID!
     maxWishPerClient: Int!
     roles: [String!]!
-    stores: [StoreLocation!]!
-    createdAt: DateTime!
-    updatedAt: DateTime
-    _v: Int!
+    stores: [String!]!
+
+    # Return will be [EWishStatus as key]: [EWishStatus]
+    wishStatusLifeCycle: JSON!
+
+    # Return will be [ERole as key]: [EWishStatus]
+    wishStatusNotAllowedByRole: JSON!
   }
 
   # ***************** Enum Types *****************
@@ -40,21 +37,15 @@ export default gql`
     User
   }
 
-  # ***************** Input Types *****************
-
-  input PaginateOptions {
-    page: Int
-    limit: Int
-    sort: JSON
+  enum Sort {
+    asc
+    desc
   }
+
+  # ***************** Input Types *****************
 
   input UpdateAppPropertiesInput {
     maxWishPerClient: Int!
-  }
-
-  input StoreLocationInput {
-    code: String!
-    name: String!
   }
 
   # ***************** Root Types *****************

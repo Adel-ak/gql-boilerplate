@@ -1,6 +1,6 @@
 import mongoose, { AggregatePaginateModel, PaginateModel, Document } from 'mongoose';
 import { GQL_Watch } from '../../generated-types/graphql.js';
-import { genDefaultID, schemaDefaultOptions } from '../index.js';
+import { genDefaultId, schemaDefaultOptions } from '../index.js';
 import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
@@ -12,7 +12,7 @@ interface IWatchDocument extends IWatch, Omit<Document, '_id'> {}
 
 const SchemaDef = new Schema<IWatch>(
   {
-    _id: { type: Schema.Types.ObjectId, default: genDefaultID },
+    _id: { type: Schema.Types.ObjectId, default: genDefaultId },
     name: { type: String, require: true },
     code: { type: String, require: true, unique: true },
     disabled: { type: Boolean, default: false },

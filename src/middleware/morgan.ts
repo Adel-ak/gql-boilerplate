@@ -22,11 +22,23 @@ export const morganMiddleware = (app: Express) => {
   });
 
   const morganMiddleware = morgan((tokens, req, res) => {
-    const method = tokens.method(req, res);
     const url = tokens.url(req, res);
+    if (url !== '/graphql')
+      return [
+        tokens.method(req, res),
+        url,
+        tokens.status(req, res),
+        tokens.res(req, res, 'content-length'),
+        '-',
+        tokens['response-time'](req, res),
+        'ms',
+      ].join(' ');
+
+    const method = tokens.method(req, res);
+
     const status = tokens.status(req, res);
     const resTime = tokens['response-time'](req, res);
-    const resContentLength = tokens.res(req, res, 'content-length');
+    const resContentLength = tokens.res(req, res, 'content-length') || '';
 
     const opName = tokens.opName(req, res) || '';
 

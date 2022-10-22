@@ -13,10 +13,10 @@ export const Query: GQL_QueryResolvers = {
 
     return user!;
   },
-  listUsers: async (_, { filter, options }, { injector }) => {
+  listUsers: async (_, { input }, { injector, authUser }) => {
     const userService = injector.get(UserService);
 
-    const [users] = await userService.getUsersList(options, filter);
+    const [users] = await userService.getUsersList(input || {}, authUser!);
 
     return users!;
   },

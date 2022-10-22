@@ -10,10 +10,11 @@ import { crunch } from 'graphql-crunch';
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
 import { Server } from 'http';
 import { parse } from 'url';
-import { startApolloSocketServer } from './ws.js';
 import { Env } from '../config/env.js';
-import { clientLoader } from '../gql/loader/client.loader.js';
-import { watchLoader } from '../gql/loader/watch.loader.js';
+import { clientLoader, watchLoader, userLoader } from '../gql/loader/index.js';
+import { DataLoader } from '../shared/types/loader.type.js';
+import { wait } from '../utils/index.js';
+import { startApolloSocketServer } from './ws.js';
 
 export const startApolloServer = async (
   schema: GraphQLSchema,
@@ -54,12 +55,16 @@ export const startApolloServer = async (
           const version = parseInt(crunchVersion);
           response.data = crunch(response.data, version);
         }
+
         return response;
       },
-      context: (ctx) => {
-        const loaders = {
+
+      context: async (ctx) => {
+        await wait(0.3);
+        const loaders: DataLoader = {
           clientLoader: clientLoader(),
           watchLoader: watchLoader(),
+          userLoader: userLoader(),
         };
         return { ...ctx, loaders };
       },

@@ -12,7 +12,7 @@ export const Mutation: GQL_MutationResolvers = {
       user: authUser?.userName,
       role: authUser?.role,
       action: `Updated Properties`,
-      msg: 'blah blah blah',
+      msg: `updated maxWishPerClient to ${input.maxWishPerClient}`,
     };
     return properties!;
   },

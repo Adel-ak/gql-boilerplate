@@ -1,19 +1,39 @@
 import { GQL_MutationResolvers } from '../../generated-types/graphql.js';
 import { toFieldErrors } from '../../utils/index.js';
-import { WishService } from '../services/waitList.service.js';
-import { addToWishListDtoV } from './dto/add-to-wish-list.dto.js';
+import { WishService } from '../services/wish.service.js';
+import { createWishDtoV } from './dto/create-wish.dto copy.js';
+import { updateWishStatusDtoV } from './dto/update-wish-status.dto.js';
 
 export const Mutation: GQL_MutationResolvers = {
-  addToWishList: async (_, { input }, { injector, authUser }) => {
-    const { error } = addToWishListDtoV(input);
+  createWish: async (_, { input }, { injector, authUser }) => {
+    console.log('🚀 ~ file: mutation.ts ~ line 25 ~ updateWishStatus: ~ input', input);
+
+    const { error } = createWishDtoV(input);
 
     if (error) {
       return toFieldErrors(error);
     }
 
-    const waitListService = injector.get(WishService);
+    const waitService = injector.get(WishService);
 
-    const [wish, wishErr] = await waitListService.addToList(input, authUser!);
+    const [wish, wishErr] = await waitService.create(input, authUser!);
+
+    if (wishErr) return wishErr;
+
+    wish!.__typename = 'Wish';
+
+    return wish!;
+  },
+  updateWishStatus: async (_, { input }, { injector, authUser }) => {
+    const { error } = updateWishStatusDtoV(input);
+
+    if (error) {
+      return toFieldErrors(error);
+    }
+
+    const waitService = injector.get(WishService);
+
+    const [wish, wishErr] = await waitService.updateStatus(input, authUser!);
 
     if (wishErr) return wishErr;
 

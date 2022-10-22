@@ -13,7 +13,7 @@ const { IS_DEV } = Env;
 const cookieOptions: CookieOptions = {
   secure: IS_DEV,
   httpOnly: true,
-  sameSite: 'strict',
+  sameSite: 'none',
   expires: dayjs().utc().add(1, 'month').toDate(),
 };
 

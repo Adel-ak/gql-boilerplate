@@ -1,7 +1,17 @@
 import { Env } from '../../config/env.js';
-import { GQL_ReqError } from '../../generated-types/graphql.js';
+import { GQL_FieldError, GQL_FieldErrors, GQL_ReqError } from '../../generated-types/graphql.js';
 
 export type GQL_Context = GraphQLModules.GlobalContext;
+
+export class FieldErrors implements GQL_FieldErrors {
+  constructor(fields?: GQL_FieldError[]) {
+    this.fieldErrors = fields || [];
+    this.__typename = 'FieldErrors';
+  }
+
+  fieldErrors: GQL_FieldError[];
+  __typename: 'FieldErrors';
+}
 
 type ReqErrorConstructor = {
   message?: string;

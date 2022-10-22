@@ -3,6 +3,8 @@ import { __dirname } from '../../utils/path.js';
 import { loadFiles } from '@graphql-tools/load-files';
 import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge';
 import { WatchModule } from './generated-types/module-types.js';
+import { WatchProvider } from '../services/watch.service.js';
+import isAuthenticated from '../middleware/auth.js';
 
 const dirname = __dirname(import.meta.url);
 
@@ -15,7 +17,11 @@ const [loadedTypeDefs, loadedResolvers] = await Promise.all([
 const typeDefs = mergeTypeDefs(loadedTypeDefs);
 const resolvers = mergeResolvers([...loadedResolvers, {}]);
 
-const middlewares: WatchModule.MiddlewareMap = {};
+const middlewares: WatchModule.MiddlewareMap = {
+  Query: {
+    filterWatches: [isAuthenticated()],
+  },
+};
 
 export const watchModule = createModule({
   id: 'watch-module',
@@ -23,4 +29,5 @@ export const watchModule = createModule({
   typeDefs,
   resolvers,
   middlewares,
+  providers: [WatchProvider],
 });
