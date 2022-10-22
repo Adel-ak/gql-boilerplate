@@ -6,7 +6,7 @@ import mongoosePaginate from 'mongoose-paginate-v2';
 
 const { Schema, model } = mongoose;
 
-export interface IWatch extends GQL_Watch {}
+export type IWatch = GQL_Watch;
 
 interface IWatchDocument extends IWatch, Omit<Document, '_id'> {}
 

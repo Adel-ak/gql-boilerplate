@@ -4,7 +4,7 @@ import { genDefaultId, schemaDefaultOptions } from '../index.js';
 
 const { Schema, model } = mongoose;
 
-export interface IClient extends GQL_Client {}
+export type IClient = GQL_Client;
 
 export interface IClientDocument extends IClient, Omit<Document, '_id'> {}
 

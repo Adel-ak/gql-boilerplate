@@ -6,7 +6,7 @@ import mongoosePaginate from 'mongoose-paginate-v2';
 
 const { Schema, model } = mongoose;
 
-export interface IWish extends GQL_Wish {}
+export type IWish = GQL_Wish;
 
 export interface IWishDocument extends IWish, Omit<Document, '_id'> {}
 

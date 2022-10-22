@@ -17,7 +17,7 @@ export const JoiIsObjectId = (value: string, helper: CustomHelpers) => {
 };
 
 export const JoiNoSpace = (value: string, helper: CustomHelpers) => {
-  var regex = /\s/;
+  const regex = /\s/;
 
   if (regex.test(value)) {
     const label_flags = helper.schema._flags.label || '';
