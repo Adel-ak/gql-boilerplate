@@ -1,4 +1,5 @@
 dist
-.eslintrc.js
+build
+.eslintrc.cjs
 *.json
 *.d.ts

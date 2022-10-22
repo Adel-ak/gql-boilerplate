@@ -6,8 +6,6 @@ import { updateWishStatusDtoV } from './dto/update-wish-status.dto.js';
 
 export const Mutation: GQL_MutationResolvers = {
   createWish: async (_, { input }, { injector, authUser }) => {
-    console.log('🚀 ~ file: mutation.ts ~ line 25 ~ updateWishStatus: ~ input', input);
-
     const { error } = createWishDtoV(input);
 
     if (error) {

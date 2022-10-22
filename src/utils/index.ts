@@ -4,8 +4,6 @@ import { errorsMessages } from '../constants/errors.js';
 import { GQL_FieldError, GQL_FieldErrors } from '../generated-types/graphql.js';
 import { FieldErrors } from '../shared/types/gql.type.js';
 
-import { __dirname } from './path.js';
-
 const { Types } = mongoose;
 
 /**
@@ -52,7 +50,7 @@ export const isValidObjectId = (value: any) => Types.ObjectId.isValid(value);
 export const createMongoDuplicateFieldErrors = (err: any): GQL_FieldErrors => {
   const fe = new FieldErrors();
 
-  for (let key in err['keyPattern']) {
+  for (const key in err['keyPattern']) {
     fe.fieldErrors.push({
       field: key,
       message: errorsMessages.inUse[key] || `${key} is in use by another user.`,
